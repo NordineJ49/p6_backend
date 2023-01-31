@@ -2,6 +2,10 @@
 const http = require('http');
 const app = require('./app');
 
+
+
+
+
 // Fonction normalizePort qui prend une valeur de numéro de port sur lequel le serveur doit écouter
 const normalizePort = val => {
     const port = parseInt(val, 10);
@@ -18,39 +22,52 @@ const normalizePort = val => {
     return false;
 };
 
+
+
+
 // variable qui défini sur quel port le serveur doit écouter
 const port = normalizePort(process.env.PORT || '3000');
 // methode set de l'application Express pour définir la propriété 'port' sur la valeur de la variable 'port'
 app.set('port', port);
 
-// fonction errorHandler qui gère les erreurs
+
+
+
+// fonction errorHandler qui gère les erreurs qui peuvent survenir lors de la mise en ecoute du serveur http 
 const errorHandler = error => {
     if (error.syscall !== 'listen') {
-        throw error;
+        throw error
     }
-    const address = server.address();
-    const bind = typeof address === 'string' ? 'pipe ' + address : 'port: ' + port;
+    // const adress = adresse du serveur 
+    const address = server.address()
+    //const bind, coondition ternaire qui determine si address est une string ou un nombre
+    const bind = typeof address === 'string' ? 'pipe ' + address : 'port: ' + port
+    // switch pour les differents codes d'erreur potentiels
     switch (error.code) {
         case 'EACCES':
-            console.error(bind + ' requires elevated privileges.');
-            process.exit(1);
-            break;
+            console.error(bind + ' requires elevated privileges.')
+            process.exit(1)
+            break
         case 'EADDRINUSE':
-            console.error(bind + ' is already in use.');
-            process.exit(1);
-            break;
+            console.error(bind + ' is already in use.')
+            process.exit(1)
+            break
         default:
-            throw error;
+            throw error
     }
-};
+}
 
-const server = http.createServer(app);
 
-server.on('error', errorHandler);
+// const server qui creer un serveur en utilisant le module http et l'application express "app"
+const server = http.createServer(app)
+
+// on configure les evenemnt pour gerer les erreurs et la mise en ecoute du serveur
+server.on('error', errorHandler)
 server.on('listening', () => {
-    const address = server.address();
-    const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-    console.log('Listening on ' + bind);
-});
+    const address = server.address()
+    const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port
+    console.log('Listening on ' + bind)
+})
 
-server.listen(port);
+// on démarre le serveur et on ecoute sur le port spécifier
+server.listen(port)

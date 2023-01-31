@@ -141,3 +141,61 @@ exports.getAllSauces = async (req, res, next) => {
     }
 }
 
+
+
+
+
+exports.likeSauce = async (req, res, next) => {
+    // Bloc try/catch pour gerer les erreurs potentielles
+    try {
+        // verification de la valeur de `req.body.like`
+        switch (req.body.like) {
+            case 0:
+                // recupération de l'id de la sauce dans l'url
+                const sauce = await Sauce.findOne({ _id: req.params.id })
+
+                // Vérifier si l'utilisateur a déjà like ou dislike la sauce
+                if (sauce.usersLiked.find(user => user === req.body.userId)) {
+                    // on retire le like et suppression de l'utilisateur de la liste des utilisateurs ayant like
+                    await Sauce.updateOne({ _id: req.params.id }, {
+                        $inc: { likes: -1 },
+                        $pull: { usersLiked: req.body.userId },
+                    })
+                    res.status(201).json({ message: 'Ton avis a été pris en compte!' })
+                } else if (sauce.usersDisliked.find(user => user === req.body.userId)) {
+                    // on retire le dislike et suppression de l'utilisateur de la liste des utilisateurs ayant dislike
+                    await Sauce.updateOne({ _id: req.params.id }, {
+                        $inc: { dislikes: -1 },
+                        $pull: { usersDisliked: req.body.userId },
+                    })
+                    res.status(201).json({ message: 'Ton avis a été pris en compte!' })
+                }
+                break
+
+            case 1:
+                // Ajout d'un like et ajout de l'utilisateur à la liste des utilisateurs ayant like
+                await Sauce.updateOne({ _id: req.params.id }, {
+                    $inc: { likes: 1 },
+                    $push: { usersLiked: req.body.userId },
+                });
+                res.status(201).json({ message: 'Ton like a été pris en compte!' })
+                break
+
+            case -1:
+                // Ajout d'un dislike et ajout de l'utilisateur à la liste des utilisateurs ayant dislike
+                await Sauce.updateOne({ _id: req.params.id }, {
+                    $inc: { dislikes: 1 },
+                    $push: { usersDisliked: req.body.userId },
+                })
+                res.status(201).json({ message: 'Ton dislike a été pris en compte!' });
+                break
+
+            default:
+                console.error('Mauvaise requête')
+        }
+    } catch (error) {
+        // Retour d'une erreur avec un statut HTTP 400 en cas d'exception
+        res.status(400).json({ error })
+    }
+};
+

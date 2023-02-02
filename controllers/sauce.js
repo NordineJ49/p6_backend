@@ -48,28 +48,28 @@ exports.modifySauce = async (req, res) => {
             res.status(403).json({ error: "Invalid user ID." });
         } // sinon, si auteur = utilisateur connecté 
         else {
-            // Si fichier image dans la requete ET une image qu'une imageUrl est associer à la sauce
+            // Si fichier image dans la requete ET qu'une imageUrl est associer à la sauce
             if (req.file && sauce.imageUrl) {
                 // suppression de l'image précédente associée a la sauce
-                fs.unlink(`${sauce.imageUrl.split("/").slice(3).join("/")}`, () => {
-                    console.log(
-                        ` Image deleted : ${sauce.imageUrl}`
-                    );
-                });
+                // sinon, si auteur = utilisateur on recupere le nom du fichier
+                const filename = sauce.imageUrl.split('/images/')[1];
+                // on le transmet comme argument a la fonction unlikePromise()
+                await unlinkPromise(`images/${filename}`);
+                // on supprime la sauce correspondante a l'id récupéré dans la const sauce
             } // mise à jour de l'id dans l'url et dans l'objet sauceObject
             await Sauce.updateOne(
                 { _id: req.params.id },
                 { ...sauceObject, _id: req.params.id }
-            );
+            )
             // si aucune erreur
-            res.status(200).json({ message: "Objet modifié." });
+            res.status(200).json({ message: "Objet modifié." })
         }
     } // si erreur, le bloc catch est exécuté 
     catch (error) {
-        console.log(error);
-        res.status(400).json(error);
+        console.log(error)
+        res.status(400).json(error)
     }
-};
+}
 
 
 
@@ -144,7 +144,7 @@ exports.getAllSauces = async (req, res, next) => {
 
 
 
-
+// fonction qui permet d'ajouter/retirer un like/dislike
 exports.likeSauce = async (req, res, next) => {
     // Bloc try/catch pour gerer les erreurs potentielles
     try {

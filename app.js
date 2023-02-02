@@ -11,10 +11,11 @@ require('dotenv').config()
 // import des routes pour les sauces et les users
 const sauceRoutes = require('./routes/sauce')
 const userRoutes = require('./routes/user')
+const helmet = require('helmet')
+const mongoSanitize = require('express-mongo-sanitize')
 
 
-
-
+mongoose.set('strictQuery', true)
 //fonction connect qui essaie de se connecter a une bade de données mongoDB en utilisant Mongoose
 const connect = async () => {
     try {
@@ -50,7 +51,7 @@ app.use((req, res, next) => {
 })
 
 
-
+app.use(mongoSanitize({ replaceWith: '_' }))
 
 // configure l'app express pour gerer les requetes http et les reponses
 // on demande a express de traiter les données json des requetes 
@@ -59,7 +60,7 @@ app.use(express.json())
 app.use('/api/sauces', sauceRoutes)
 app.use('/api/auth', userRoutes)
 app.use('/images', express.static(path.join(__dirname, 'images')))
-
+app.use(helmet())
 
 
 

@@ -2,6 +2,7 @@
 
 // import express framework pour app web node.js
 const express = require('express')
+const limiter = require('./middlewares/limiter')
 // module mongoose qui est un odm (object document mapping) pour mongodb
 const mongoose = require('mongoose')
 // module qui permet de fournir des fonctions pour travailler avec des chemins de fichiers
@@ -13,6 +14,8 @@ const sauceRoutes = require('./routes/sauce')
 const userRoutes = require('./routes/user')
 const helmet = require('helmet')
 const mongoSanitize = require('express-mongo-sanitize')
+
+
 
 
 mongoose.set('strictQuery', true)
@@ -36,10 +39,13 @@ connect()
 
 
 
+
+
 // const app qui utilise express() pour gerer les routes et les middlewares (app.use etc ...)
 const app = express();
 
 
+app.use(limiter)
 
 
 // methode use de l'appli express pour ajouter un middleware qui permet de definir les headers pour gérer les problèmes d'accès lié a la sécurité
@@ -49,6 +55,7 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
     next()
 })
+
 
 
 app.use(mongoSanitize({ replaceWith: '_' }))

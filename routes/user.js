@@ -6,8 +6,6 @@ const password = require('../middlewares/password')
 
 
 
-
-
 router.post('/signup', mail, password, userCtrl.signup)
 router.post('/login', userCtrl.login)
 
